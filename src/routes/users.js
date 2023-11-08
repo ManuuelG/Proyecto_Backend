@@ -5,6 +5,7 @@ const { Router } = require('express')
 const { body, validationResult } = require('express-validator')
 
 const admin = require('../middlewares/admin')
+const auth = require('../middlewares/auth')
 
 const { User } = require('../models/user')
 
@@ -67,7 +68,7 @@ router.post(
   }
 )
 
-router.put('/assign_role', admin, async (req, res) => {
+router.put('/assign_role', auth, admin, async (req, res) => {
   try {
     const { userId, role } = req.body
 

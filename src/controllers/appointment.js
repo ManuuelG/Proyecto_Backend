@@ -2,9 +2,12 @@ const { Appointment } = require('../models/appointment')
 
 const getAll = async (req, res) => {
   const { date } = req.query
+  console.log(req.user)
+  const { userId } = req.user
 
   if (date) {
-    const appointments = await Appointment.find({ date })
+    const appointments = await Appointment.find({ date, userId })
+
     if (appointments.length === 0) {
       return res.status(404).json({
         message: 'No se encontraron citas en la fecha que has proporcionado',
@@ -12,7 +15,7 @@ const getAll = async (req, res) => {
     }
     return res.json(appointments)
   } else {
-    const allAppointments = await Appointment.find()
+    const allAppointments = await Appointment.find({ userId })
     return res.json(allAppointments)
   }
 }
@@ -20,6 +23,15 @@ const getAll = async (req, res) => {
 const create = async (req, res) => {
   try {
     const { comment, doctorId, patientId, date } = req.body
+
+    const existingAppointment = await Appointment.findOne({
+      date,
+      doctorId,
+      patientId,
+    })
+    if (existingAppointment) {
+      return res.status(400).json({ error: 'La cita ya existe' })
+    }
 
     if (!(doctorId || patientId)) {
       return res

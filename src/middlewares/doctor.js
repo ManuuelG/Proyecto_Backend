@@ -1,7 +1,7 @@
 module.exports = (req, res, next) => {
   const { role } = req.user
 
-  if (role === 'Admin') {
+  if (role === 'Doctor') {
     next()
   } else {
     console.log('estas jodio')

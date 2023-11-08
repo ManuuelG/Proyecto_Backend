@@ -12,7 +12,7 @@ const Appointment = mongoose.model('Appointment', appointmentSchema)
 
 exports.Appointment = Appointment
 
-const appointmentValidation = body('date').notEmpty().isISO8601('yyyy-mm-dd')
+const appointmentValidation = body('date').notEmpty()
 body('doctorId').notEmpty()
 body('patientId').notEmpty()
 

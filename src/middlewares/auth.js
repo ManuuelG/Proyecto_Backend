@@ -5,7 +5,8 @@ module.exports = (req, res, next) => {
 
   const token = req.headers['x-auth-token']
 
-  if (!token) return res.status(401).json({ msg: 'No hay token de acceso.' })
+  if (!token)
+    return res.status(401).json({ msg: 'There is not an access token' })
 
   console.log(token)
 
@@ -15,6 +16,6 @@ module.exports = (req, res, next) => {
     req.user = decoded
     next()
   } catch (err) {
-    res.status(400).json({ msg: 'token invalido.' })
+    res.status(400).json({ msg: 'Invalid token' })
   }
 }
