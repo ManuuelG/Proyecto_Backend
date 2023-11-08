@@ -1,21 +1,48 @@
 const { Appointment } = require('../models/appointment')
 
-const create = async (req, res) => {
-  const newAppointment = await Appointment.create(req.body)
-
-  res.json(newAppointment)
-}
-
 const getAll = async (req, res) => {
-  const appointments = await Appointment.find()
+  const { date } = req.query
 
-  res.json(appointments)
+  if (date) {
+    const appointments = await Appointment.find({ date })
+    if (appointments.length === 0) {
+      return res.status(404).json({
+        message: 'No se encontraron citas en la fecha que has proporcionado',
+      })
+    }
+    return res.json(appointments)
+  } else {
+    const allAppointments = await Appointment.find()
+    return res.json(allAppointments)
+  }
 }
 
-const getAppointmentById = async (req, res) => {
-  const appointment = await Appointment.findById(req.params.appointmentId)
+const create = async (req, res) => {
+  try {
+    const { comment, doctorId, patientId, date } = req.body
 
-  res.json(appointment)
+    if (!(doctorId || patientId)) {
+      return res
+        .status(400)
+        .json({ error: 'Debes proporcionar doctorId o pacienteId.' })
+    }
+
+    const newAppointment = new Appointment({
+      comment,
+      doctorId,
+      patientId,
+      date: date.toString(),
+    })
+
+    const createdAppointment = await newAppointment.save()
+
+    return res.status(201).json(createdAppointment)
+  } catch (error) {
+    console.error(error)
+    return res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al crear la cita.' })
+  }
 }
 
 const update = async (req, res) => {
@@ -23,7 +50,6 @@ const update = async (req, res) => {
     req.params.appointmentId,
     req.body,
     {
-      //REVISAR
       new: true,
     }
   )
@@ -34,15 +60,14 @@ const update = async (req, res) => {
 const remove = async (req, res) => {
   const appointment = await Appointment.findByIdAndDelete(
     req.params.appointmentId
-  ) // REVISAR
+  )
 
   res.json(appointment)
 }
 
 module.exports = {
-  create,
   getAll,
-  getAppointmentById,
+  create,
   update,
   remove,
 }

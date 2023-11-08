@@ -38,19 +38,19 @@ GET user/citas/:citaByDate (me da las citas filtradas por mes y dia)
 GET user/citas/:citaByDate/:citaById ==users== (me da la cita concreta del mes y dia filtrado)
 GET user/citas/:citaByDate/:DoctorId (me da la disponibilidad del doctor)
 
-POST user/citas/:citaByDate/:DoctorId/create ==users== (El paciente pide una nueva cita el dia que elija con el doctor)
-POST user/citas/:citaByDate/:PacienteId/create ==users== (El doctor asigna una nueva cita el dia que elija con el paciente)
-PUT user/citas/:citaByDate/:citaById/update ==doctor== (Edita una cita concreta de un dia concreto)
-DELETE user/citas/:citaByDate/:citaById/delete ==doctor== (Elimina una cita concreta de un dia concreto)
+POST user/citas/:citaByDate/:DoctorId ==users== (El paciente pide una nueva cita el dia que elija con el doctor)
+POST user/citas/:citaByDate/:PacienteId/ ==users== (El doctor asigna una nueva cita el dia que elija con el paciente)
+PUT user/citas/:citaByDate/:citaById/ ==doctor== (Edita una cita concreta de un dia concreto)
+DELETE user/citas/:citaByDate/:citaById/ ==doctor== (Elimina una cita concreta de un dia concreto)
 
 //RECETAS
 
 GET user/recetas (me da todas las recetas del usuario)
 GET user/recetas/:RecetaId (me da la receta concreta del usuario)
 
-POST user/recetas/:userId/create ==doctor== (Crea una receta para un usuario concreto)
-PUT user/recetas/:RecetaId/update ==doctor== (Edita una receta para un usuario concreto)
-DELETE user/recetas/:RecetaId/delete ==doctor== (Actualiza una receta para un usuario concreto)
+POST user/recetas/:userId/ ==doctor== (Crea una receta para un usuario concreto)
+PUT user/recetas/:RecetaId/ ==doctor== (Edita una receta para un usuario concreto)
+DELETE user/recetas/:RecetaId/ ==doctor== (Actualiza una receta para un usuario concreto)
 
 ### Schemas
 

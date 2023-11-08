@@ -11,7 +11,6 @@ const { Router } = require('express')
 const router = Router()
 
 router.get('/', appointmentController.getAll)
-router.get('/:appointmentId', appointmentController.getAppointmentById)
 router.post('/', appointmentValidation, validate, appointmentController.create)
 
 router.put(
