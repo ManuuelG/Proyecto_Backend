@@ -28,9 +28,47 @@ const getPrescriptionById = async (req, res) => {
 }
 
 const create = async (req, res) => {
-  const newPrescription = await Prescription.create(req.body)
+  try {
+    const { username, date, medicine, duration, doctorId, patientId } = req.body
+    console.log(req.user.role)
 
-  res.json(newPrescription)
+    const userRole = req.user.role
+
+    if (userRole === 'Doctor' && doctorId) {
+      return res.status(403).json({
+        error: 'Los doctores no pueden asignar recetas a otros doctores',
+      })
+    }
+
+    const existingPrescription = await Prescription.findOne({
+      medicine,
+      patientId,
+    })
+    if (existingPrescription) {
+      return res.status(400).json({ error: 'La receta ya existe' })
+    }
+
+    // if (!doctorId) {
+    //   return res.status(400).json({ error: 'Debes proporcionar doctorId' })
+    // }
+
+    const newPrescription = new Prescription({
+      username,
+      date: date.toString(),
+      medicine,
+      duration,
+      patientId,
+    })
+
+    const createdPrescription = await newPrescription.save()
+
+    return res.status(201).json(createdPrescription)
+  } catch (error) {
+    console.error(error)
+    return res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al crear la cita.' })
+  }
 }
 
 const update = async (req, res) => {

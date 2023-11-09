@@ -14,6 +14,8 @@ router.get('/', prescriptionController.getAll)
 router.get('/:prescriptionId', prescriptionController.getPrescriptionById)
 router.post(
   '/',
+  auth,
+  doctor,
   prescriptionValidation,
   validate,
   prescriptionController.create
@@ -21,6 +23,8 @@ router.post(
 
 router.put(
   '/:prescriptionId',
+  auth,
+  doctor,
   mongoIdFromParamValidation('prescriptionId'),
   prescriptionValidation,
   validate,
@@ -28,6 +32,8 @@ router.put(
 )
 router.delete(
   '/:prescriptionId',
+  auth,
+  doctor,
   mongoIdFromParamValidation('prescriptionId'),
   validate,
   prescriptionController.remove

@@ -1,4 +1,5 @@
 const { Appointment } = require('../models/appointment')
+const { User } = require('../models/user')
 
 const getAll = async (req, res) => {
   try {
@@ -21,16 +22,34 @@ const create = async (req, res) => {
 
     const userRole = req.user.role
 
-    if (userRole === 'Doctor' && doctorId) {
-      return res.status(403).json({
-        error: 'Los doctores no pueden asignar citas a otros doctores',
-      })
+    if (userRole === 'Doctor') {
+      if (doctorId || !patientId) {
+        return res.status(403).json({
+          error: 'Un doctor solo puede proporcionar un pacienteId válido.',
+        })
+      }
+
+      const patientUser = await User.findById(patientId)
+      if (!patientUser || patientUser.role !== 'Patient') {
+        return res.status(403).json({
+          error: 'El ID proporcionado no corresponde a un paciente.',
+        })
+      }
     }
 
-    if (userRole === 'Patient' && patientId) {
-      return res.status(403).json({
-        error: 'Los pacientes no pueden asignar citas a otros pacientes',
-      })
+    if (userRole === 'Patient') {
+      if (patientId || !doctorId) {
+        return res.status(403).json({
+          error: 'Un paciente solo puede proporcionar un DoctorId válido.',
+        })
+      }
+
+      const doctorUser = await User.findById(doctorId)
+      if (!doctorUser || doctorUser.role !== 'Doctor') {
+        return res.status(403).json({
+          error: 'El ID proporcionado no corresponde a un doctor.',
+        })
+      }
     }
 
     const existingAppointment = await Appointment.findOne({
@@ -68,6 +87,8 @@ const create = async (req, res) => {
 }
 
 const update = async (req, res) => {
+  //Comprobar si antes de hacer el editar, la id de la cita corresponde con la de ese doctor
+
   const appointment = await Appointment.findByIdAndUpdate(
     req.params.appointmentId,
     req.body,
@@ -80,6 +101,8 @@ const update = async (req, res) => {
 }
 
 const remove = async (req, res) => {
+  //Comprobar si antes de hacer el delete, la id de la cita corresponde con la de ese doctor
+
   const appointment = await Appointment.findByIdAndDelete(
     req.params.appointmentId
   )
