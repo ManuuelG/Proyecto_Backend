@@ -1,15 +1,30 @@
 const { Prescription } = require('../models/prescription')
 
 const getAll = async (req, res) => {
-  const prescriptions = await Prescription.find()
+  try {
+    const userId = req.user.id
 
-  res.json(prescriptions)
+    const userPrescriptions = await Prescription.find({
+      $or: [{ patientId: userId }, { doctorId: userId }],
+    })
+
+    return res.json(userPrescriptions)
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ msg: 'Algo inesperado ha ocurrido' })
+  }
 }
 
 const getPrescriptionById = async (req, res) => {
-  const prescription = await Prescription.findById(req.params.prescriptionId)
+  try {
+    const userId = req.user.id
+    const prescription = await Prescription.findById(req.params.prescriptionId)
 
-  res.json(prescription)
+    res.json(prescription)
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ msg: 'Algo inesperado ha ocurrido' })
+  }
 }
 
 const create = async (req, res) => {

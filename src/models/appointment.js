@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const { body } = require('express-validator')
 
 const appointmentSchema = new mongoose.Schema({
+  username: { type: String, required: true },
   date: { type: Date, required: true },
   comment: String,
   doctorId: { type: mongoose.ObjectId, ref: 'User' },

@@ -1,28 +1,37 @@
 const { Appointment } = require('../models/appointment')
 
 const getAll = async (req, res) => {
-  const { date } = req.query
-  console.log(req.user)
-  const { userId } = req.user
+  try {
+    const userId = req.user.id
 
-  if (date) {
-    const appointments = await Appointment.find({ date, userId })
+    const userAppointments = await Appointment.find({
+      $or: [{ patientId: userId }, { doctorId: userId }],
+    })
 
-    if (appointments.length === 0) {
-      return res.status(404).json({
-        message: 'No se encontraron citas en la fecha que has proporcionado',
-      })
-    }
-    return res.json(appointments)
-  } else {
-    const allAppointments = await Appointment.find({ userId })
-    return res.json(allAppointments)
+    return res.json(userAppointments)
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ msg: 'Algo inesperado ha ocurrido' })
   }
 }
 
 const create = async (req, res) => {
   try {
-    const { comment, doctorId, patientId, date } = req.body
+    const { username, comment, doctorId, patientId, date } = req.body
+
+    const userRole = req.user.role
+
+    if (userRole === 'Doctor' && doctorId) {
+      return res.status(403).json({
+        error: 'Los doctores no pueden asignar citas a otros doctores',
+      })
+    }
+
+    if (userRole === 'Patient' && patientId) {
+      return res.status(403).json({
+        error: 'Los pacientes no pueden asignar citas a otros pacientes',
+      })
+    }
 
     const existingAppointment = await Appointment.findOne({
       date,
@@ -40,6 +49,7 @@ const create = async (req, res) => {
     }
 
     const newAppointment = new Appointment({
+      username,
       comment,
       doctorId,
       patientId,

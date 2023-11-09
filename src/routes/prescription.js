@@ -3,8 +3,8 @@ const prescriptionController = require('../controllers/prescription')
 const mongoIdFromParamValidation = require('../middlewares/mongoIdFromParam')
 const validate = require('../middlewares/validate')
 
-// const auth = require('../middlewares/auth')
-// const admin = require('../middlewares/admin')
+const auth = require('../middlewares/auth')
+const doctor = require('../middlewares/doctor')
 
 const { Router } = require('express')
 
