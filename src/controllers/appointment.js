@@ -87,17 +87,36 @@ const create = async (req, res) => {
 }
 
 const update = async (req, res) => {
-  //Comprobar si antes de hacer el editar, la id de la cita corresponde con la de ese doctor
+  try {
+    const { name, id } = req.user
 
-  const appointment = await Appointment.findByIdAndUpdate(
-    req.params.appointmentId,
-    req.body,
-    {
-      new: true,
+    const { comment, date } = req.body
+
+    const { appointmentId } = req.params
+
+    const existingAppointment = await Appointment.findById(appointmentId)
+    if (!existingAppointment) {
+      return res.status(404).json({ error: 'La cita no existe.' })
     }
-  )
 
-  res.json(appointment)
+    if (
+      existingAppointment.username === name ||
+      existingAppointment.patientId.toString() === id ||
+      existingAppointment.doctorId.toString() === id
+    ) {
+      existingAppointment.comment = comment || existingAppointment.comment
+      existingAppointment.date = date || existingAppointment.date
+
+      const updatedAppointment = await existingAppointment.save()
+
+      return res.status(200).json(updatedAppointment)
+    }
+  } catch (error) {
+    console.error(error)
+    return res
+      .status(500)
+      .json({ error: 'Ha ocurrido un error al modificar la cita.' })
+  }
 }
 
 const remove = async (req, res) => {

@@ -22,7 +22,6 @@ router.post(
 router.put(
   '/:appointmentId',
   auth,
-  doctor,
   mongoIdFromParamValidation('appointmentId'),
   appointmentValidation,
   validate,
