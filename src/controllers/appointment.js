@@ -3,15 +3,13 @@ const { User } = require('../models/user')
 
 const getAll = async (req, res) => {
   try {
-    const userId = req.user.id
+    const { name, id } = req.user
 
     const userAppointments = await Appointment.find({
-      $or: [{ patientId: userId }, { doctorId: userId }],
+      $or: [{ patientId: id }, { doctorId: id }, { username: name }],
     })
-
     return res.json(userAppointments)
   } catch (error) {
-    console.error(error)
     return res.status(500).json({ msg: 'Algo inesperado ha ocurrido' })
   }
 }
@@ -95,6 +93,7 @@ const update = async (req, res) => {
     const { appointmentId } = req.params
 
     const existingAppointment = await Appointment.findById(appointmentId)
+
     if (!existingAppointment) {
       return res.status(404).json({ error: 'La cita no existe.' })
     }
@@ -104,15 +103,14 @@ const update = async (req, res) => {
       existingAppointment.patientId.toString() === id ||
       existingAppointment.doctorId.toString() === id
     ) {
-      existingAppointment.comment = comment || existingAppointment.comment
-      existingAppointment.date = date || existingAppointment.date
+      existingAppointment.comment = comment
+      existingAppointment.date = date
 
       const updatedAppointment = await existingAppointment.save()
 
       return res.status(200).json(updatedAppointment)
     }
   } catch (error) {
-    console.error(error)
     return res
       .status(500)
       .json({ error: 'Ha ocurrido un error al modificar la cita.' })
@@ -120,13 +118,28 @@ const update = async (req, res) => {
 }
 
 const remove = async (req, res) => {
-  //Comprobar si antes de hacer el delete, la id de la cita corresponde con la de ese doctor
+  try {
+    const { name, id } = req.user
 
-  const appointment = await Appointment.findByIdAndDelete(
-    req.params.appointmentId
-  )
+    const { appointmentId } = req.params
 
-  res.json(appointment)
+    const existingAppointment = await Appointment.findById(appointmentId)
+
+    if (
+      existingAppointment.username === name ||
+      existingAppointment.doctorId.toString() === id
+    ) {
+      console.log('Estás autorizado')
+    }
+    const deletedAppointment = await Appointment.findByIdAndDelete(
+      appointmentId
+    )
+    return res.json(deletedAppointment)
+  } catch {
+    return res
+      .status(500)
+      .json({ error: 'No tienes permiso para eliminar la cita' })
+  }
 }
 
 module.exports = {

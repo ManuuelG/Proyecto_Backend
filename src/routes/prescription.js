@@ -10,8 +10,8 @@ const { Router } = require('express')
 
 const router = Router()
 
-router.get('/', prescriptionController.getAll)
-router.get('/:prescriptionId', prescriptionController.getPrescriptionById)
+router.get('/', auth, prescriptionController.getAll)
+router.get('/:prescriptionId', auth, prescriptionController.getPrescriptionById)
 router.post(
   '/',
   auth,
