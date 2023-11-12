@@ -77,7 +77,6 @@ const create = async (req, res) => {
 
     return res.status(201).json(createdAppointment)
   } catch (error) {
-    console.error(error)
     return res
       .status(500)
       .json({ error: 'Ha ocurrido un error al crear la cita.' })

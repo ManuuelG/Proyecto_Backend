@@ -25,8 +25,6 @@ const getPrescriptionById = async (req, res) => {
       return res.status(404).json({ error: 'La receta no existe.' })
     }
 
-    console.log(prescription.patientId.toString())
-    console.log(id)
     if (
       prescription.username === name ||
       prescription.patientId.toString() === id
